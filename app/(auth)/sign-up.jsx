@@ -9,7 +9,6 @@ import { Link, router } from "expo-router";
 import { createUser } from "../../lib/appwrite";
 import { useGlobalContext } from "../../context/GlobalProvider";
 
-
 const SignUp = () => {
   const [form, setForm] = useState({
     username: "",
@@ -18,8 +17,7 @@ const SignUp = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-   const { setUser, setIsLoggedIn } = useGlobalContext();
-
+  const { setUser, setIsLoggedIn } = useGlobalContext();
 
   const submit = async () => {
     if (form.username === "" || form.email === "" || form.password === "") {
@@ -33,13 +31,13 @@ const SignUp = () => {
       setUser(res);
       setIsLoggedIn(true);
 
-      router.replace('/home')
+      router.replace("/home");
     } catch (err) {
       console.log(err);
       Alert.alert("Error", err.message);
     } finally {
       setIsSubmitting(false);
-    } 
+    }
   };
 
   return (
