@@ -8,9 +8,14 @@ const VideoCard = ({
     Title,
     thumbnail,
     video,
-    users: { username, avatar },
+    users,
   },
-}) => {
+  
+  
+}
+  
+) => {
+  // console.log(username)
   const [play, setPlay] = useState(false);
   return (
     <View className="flex-col items-center px-4 mb-14">
@@ -18,7 +23,7 @@ const VideoCard = ({
         <View className="justify-center items-center flex-row flex-1">
           <View className="w-[40px] h-[40px] rounded-full items-center border border-secondary justify-center p-0.5">
             <Image
-              source={{ uri: avatar }}
+              source={{ uri: users.avatar }}
               className="w-full h-full rounded-full"
               resizeMode="cover"
             />
@@ -34,7 +39,7 @@ const VideoCard = ({
               className="text-xs text-gray-100 font-pregular"
               numberOfLines={1}
             >
-              {username}
+              {users.username}
             </Text>
           </View>
         </View>

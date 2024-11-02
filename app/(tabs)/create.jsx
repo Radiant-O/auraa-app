@@ -5,10 +5,17 @@ import FormField from "../../components/formField";
 import { ResizeMode, Video } from "expo-av";
 import { icons } from "../../constants";
 import CustomButtom from "../../components/CustomButtom";
-import * as DocumentPicker from 'expo-document-picker';
+// import * as DocumentPicker from 'expo-document-picker';  
 import { router } from "expo-router";
+import { uploadVideo } from '../../lib/appwrite';
+import { useGlobalContext } from '../../context/GlobalProvider'
+import * as ImagePicker from "expo-image-picker"
 
 const Create = () => {
+  const { user } = useGlobalContext(); 
+
+  console.log(user)
+
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     title: "",
@@ -18,8 +25,10 @@ const Create = () => {
   });
 
   const openPicker = async (selectType) => {
-    const res = await DocumentPicker.getDocumentAsync({
-      type: selectType === 'image' ? ['image/png', 'image/jpg', 'image/jpeg'] : ['video/mp4', 'video/gif']
+    const res = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: selectType === 'image' ? ImagePicker.MediaTypeOptions.Images : ImagePicker.MediaTypeOptions.Videos,
+      aspect: [4, 3],
+      quality:1
     })
 
     if (!res.canceled) {
@@ -29,14 +38,15 @@ const Create = () => {
       if(selectType === 'video'){
         setForm({ ...form, video: res.assets[0]})
       }
-    } else {
-      setTimeout(() => {
-        Alert.alert('Document selected', JSON.stringify(res, null, 2))
-      }, 100)
     }
+    // else {
+    //   setTimeout(() => {
+    //     Alert.alert('Document selected', JSON.stringify(res, null, 2))
+    //   }, 100)
+    // }
   }
 
-  const submit = (() => {
+  const submit = ( async () => {
     if(!form.video || form.prompt === '' || form.title === "" || !form.thumbnail){
       return Alert.alert('Please fill in all the fields')
     }
@@ -44,7 +54,7 @@ const Create = () => {
     setUploading(true)
 
     try{
-
+      await uploadVideo( {...form, userId: user.$id});
       
       Alert.alert('Success', "Post uploaded successfully")
       router.push('/home');
@@ -88,8 +98,6 @@ const Create = () => {
               <Video
                 source={{ uri: form.video.uri }}
                 className="w-full h-64 rounded-2xl"
-                useNativeControls
-                isLooping
                 resizeMode={ResizeMode.COVER}
               />
             ) : (
@@ -97,7 +105,7 @@ const Create = () => {
                 <View className="w-14 h-14 border border-dashed border-secondary-100 justify-center items-center">
                   <Image
                     source={icons.upload}
-                    resizeMode="Ccontain"
+                    resizeMode="contain"
                     className="w-1/2 h-1/2"
                   />
                 </View>
@@ -112,7 +120,7 @@ const Create = () => {
 
           <TouchableOpacity onPress={() => openPicker('image')}>
             {form.thumbnail ? (
-              <Video
+              <Image
                 source={{ uri: form.thumbnail.uri }}
                 resizeMode="cover"
                 className="w-full h-64 rounded-2xl"

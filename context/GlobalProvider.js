@@ -27,7 +27,9 @@ export const useGlobalContext = () => useContext(GlobalContext);
         }
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
+        throw new Error(err);
+        
       })
       .finally(() => {
         setIsLoading(false);
