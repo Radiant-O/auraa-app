@@ -1,27 +1,21 @@
-import { View, Text, FlatList, Image, RefreshControl } from "react-native";
-import { useState } from "react";
+import { View, Text, FlatList, TouchableOpacity, Image } from "react-native";
+import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchInput from "../../components/SearchInput";
-import { images } from "../../constants";
-import Trending from "../../components/Trending";
 import EmptyState from "../../components/EmptyState";
-import { getAllPost, getTrendingPost } from "../../lib/appwrite";
+import { getUserPost } from "../../lib/appwrite";
 import useAppwrite from "../../lib/useAppwrite";
 import VideoCard from "../../components/VideoCard";
+import { useLocalSearchParams } from "expo-router";
+import { useGlobalContext } from "../../context/GlobalProvider";
+import { icons } from "../../constants";
+import InfoBox from "../../components/InfoBox";
 
 const Profile = () => {
-  const { data: posts, refetch } = useAppwrite(getAllPost);
-  const { data: trendingPosts } = useAppwrite(getTrendingPost);
+  const { user, setUser, serIsLoggedIn } = useGlobalContext();
+  const { data: posts } = useAppwrite(() => getUserPost(user.$id));
 
-  const [refreshing, setRefreshing] = useState(false);
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await refetch();
-    setRefreshing(false);
-  };
-
-  // console.log(posts)
+  const logOut = () => {};
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
@@ -29,42 +23,55 @@ const Profile = () => {
         keyExtractor={(item) => item.$id}
         renderItem={({ item }) => <VideoCard video={item} />}
         ListHeaderComponent={() => (
-          <View className="my-6 px-4 space-y-6">
-            <View className="justify-between items-start flex-row mb-6">
-              <View>
-                <Text className="font-pmedium text-sm text-gray-100">
-                  Welcome Back
-                </Text>
-                <Text className="text-2xl font-psemibold text-white">
-                  Radiant
-                </Text>
-              </View>
-              <View className="mt-1.5">
-                <Image
-                  source={images.logoSmall}
-                  className="w-8 h-9"
-                  resizeMode="contain"
-                />
-              </View>
+          <View className="w-full justify-center items-center mt-6 mb-12 px-4">
+            <TouchableOpacity
+              onPress={logOut}
+              className="w-full items-end mb-10"
+            >
+              <Image
+                source={icons.logout}
+                resizeMode="contain"
+                className="w-6 h-6"
+              />
+            </TouchableOpacity>
+
+            <View className="w-14 h-14 border border-secondary rounded-full justify-center items-center">
+              <Image
+                source={{ uri: user?.avatar }}
+                className="w-[90%] h-[90%] rounded-full"
+                resizeMode="cover"
+              />
             </View>
+            {/* <View>
+              <Text className="text-white">{ user.username }</Text>
+            </View> */}
+            <InfoBox
+              title={user?.username}
+              containerStyles="mt-5"
+              titleStyles="text-lg"
+            />
 
-            <SearchInput />
-
-            <View className="w-full flex-1 pt-5 pb-8">
-              <Text className="text-gray-100 text-lg font-pregular mb-3">
-                Latest Videos
-              </Text>
-
-              <Trending posts={trendingPosts ?? []} />
+            <View className="mt-3 flex-row">
+              <InfoBox
+                title={posts.length || 0}
+                subtitle="Posts"
+                containerStyles="mr-10"
+                titleStyles="text-xl"
+              />
+              <InfoBox
+                title="1.2k"
+                subtitle="Followers"
+                titleStyles="text-xl"
+              />
             </View>
           </View>
         )}
         ListEmptyComponent={() => (
-          <EmptyState title="No Videos Found" subtitle="Upload a video" />
+          <EmptyState
+            title="No Videos Found"
+            subtitle="No videos found for this search query"
+          />
         )}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
       />
     </SafeAreaView>
   );
