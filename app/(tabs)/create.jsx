@@ -39,11 +39,7 @@ const Create = () => {
         setForm({ ...form, video: res.assets[0]})
       }
     }
-    // else {
-    //   setTimeout(() => {
-    //     Alert.alert('Document selected', JSON.stringify(res, null, 2))
-    //   }, 100)
-    // }
+   
   }
 
   const submit = ( async () => {

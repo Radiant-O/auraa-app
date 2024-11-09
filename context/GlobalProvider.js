@@ -1,16 +1,10 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  Children,
-} from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { getCurrentUser } from "../lib/appwrite";
 
 const GlobalContext = createContext();
 export const useGlobalContext = () => useContext(GlobalContext);
 
- const GlobalProvider = ({ children }) => {
+const GlobalProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +23,6 @@ export const useGlobalContext = () => useContext(GlobalContext);
       .catch((err) => {
         // console.log(err);
         throw new Error(err);
-        
       })
       .finally(() => {
         setIsLoading(false);
